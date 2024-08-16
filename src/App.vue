@@ -5,27 +5,17 @@
 <template>
   <div id="app">
     <div class="calculator">
-      <input v-model="current" disabled />
-      <div class="buttons">
-        <button @click="clear">C</button>
-        <button @click="append('/')">/</button>
-        <button @click="append('*')">*</button>
-        <button @click="backspace">←</button>
-        <button @click="append('7')">7</button>
-        <button @click="append('8')">8</button>
-        <button @click="append('9')">9</button>
-        <button @click="append('-')">-</button>
-        <button @click="append('4')">4</button>
-        <button @click="append('5')">5</button>
-        <button @click="append('6')">6</button>
-        <button @click="append('+')">+</button>
-        <button @click="append('1')">1</button>
-        <button @click="append('2')">2</button>
-        <button @click="append('3')">3</button>
-        <button @click="calculate">=</button>
-        <button @click="append('0')">0</button>
-        <button @click="append('.')">.</button>
-      </div>
+      <input v-model.number="operand1" type="number" placeholder="Enter first number" />
+      <select v-model="operation">
+        <option value="+">+</option>
+        <option value="-">-</option>
+        <option value="*">*</option>
+        <option value="/">/</option>
+      </select>
+      <input v-model.number="operand2" type="number" placeholder="Enter second number" />
+      <button @click="calculate">=</button>
+      <input :value="result" disabled placeholder="Result" />
+      <button @click="clear">C</button>
     </div>
   </div>
 </template>
@@ -34,25 +24,33 @@
 export default {
   data() {
     return {
-      current: '',
+      operand1: null,
+      operand2: null,
+      operation: '+',
+      result: null,
     };
   },
   methods: {
-    append(char) {
-      this.current += char;
+    calculate() {
+      if (this.operation === '+') {
+        this.result = this.operand1 + this.operand2;
+      } else if (this.operation === '-') {
+        this.result = this.operand1 - this.operand2;
+      } else if (this.operation === '*') {
+        this.result = this.operand1 * this.operand2;
+      } else if (this.operation === '/') {
+        if (this.operand2 !== 0) {
+          this.result = this.operand1 / this.operand2;
+        } else {
+          this.result = 'Error: Division by zero';
+        }
+      }
     },
     clear() {
-      this.current = '';
-    },
-    backspace() {
-      this.current = this.current.slice(0, -1);
-    },
-    calculate() {
-      try {
-        this.current = eval(this.current).toString();
-      } catch (e) {
-        this.current = 'Error';
-      }
+      this.operand1 = null;
+      this.operand2 = null;
+      this.operation = '+';
+      this.result = null;
     },
   },
 };
@@ -68,31 +66,26 @@ export default {
 }
 
 .calculator {
-  width: 400px;
+  width: 300px;
   padding: 20px;
   background-color: #fff;
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-}
-
-input {
-  width: 100%;
-  height: 50px;
-  font-size: 24px;
-  text-align: right;
-  margin-bottom: 10px;
-  padding: 5px;
-}
-
-.buttons {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  display: flex;
+  flex-direction: column;
   gap: 10px;
 }
 
+input,
+select,
 button {
-  width: 100%;
-  height: 50px;
+  height: 40px;
   font-size: 18px;
+  padding: 5px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+button {
   background-color: #e0e0e0;
   border: none;
   cursor: pointer;
